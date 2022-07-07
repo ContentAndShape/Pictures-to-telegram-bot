@@ -1,4 +1,11 @@
+import os
+import sys
+import requests
 from dataclasses import dataclass, field
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from settings import USER_ID
 
 
 @dataclass
@@ -33,3 +40,18 @@ class User:
                 self.hashtags.remove(hashtag)
             else:
                 raise ValueError(f"{hashtag} not in {self.username}'s hashtags")
+
+
+@dataclass
+class Hashtag:
+    """
+    Stores info about hashtags and sets their ids
+    """
+    name: str
+    node_id: str = None
+
+    def set_node_id(self) -> None:
+        """Sets a node_id of hashtag by name"""
+        node_query_str = f"https://graph.facebook.com/ig_hashtag_search?user_id={USER_ID}&q={self.name}"
+        self.node_id = requests.get(node_query_str)["id"]
+        
